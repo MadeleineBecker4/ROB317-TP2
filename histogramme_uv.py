@@ -7,6 +7,7 @@ Created on Thu Nov  5 11:14:50 2020
 
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
@@ -14,11 +15,21 @@ filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #directory = '../TP2_Videos_Exemples/'
 directory = './TP2_Videos/'
 nVal = 256
+nbImages = 3168
 #nValU = nVal
 #nValV = nVal
 histUV = np.zeros((nVal,nVal))
 histUV_old = np.zeros((nVal,nVal))
 cap = cv2.VideoCapture(directory+filename)
+
+dist_Correl = np.zeros(nbImages)
+dist_ChiSquare = np.zeros(nbImages)
+dist_Intersection = np.zeros(nbImages)
+dist_Bhattacharyya = np.zeros(nbImages)
+dist_Hellinger = np.zeros(nbImages)
+dist_ChiSquareAlt = np.zeros(nbImages)
+dist_KLDiv = np.zeros(nbImages)
+X = np.arange(nbImages)
 
 ret,frame = cap.read()
 index = 0
@@ -45,11 +56,13 @@ while(ret):
     cv2.imshow('histogramme visible by human',HumanVisibleHistogrammeUV/(HumanVisibleHistogrammeUV.max()-HumanVisibleHistogrammeUV.min()))
     
     if index>0:
-        distance = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_CORREL)
-        if distance <0.3:
-            print(distance)
-            cv2.imwrite('image%04d.png'%index,frame)
-
+        dist_Correl[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_CORREL)
+        dist_ChiSquare[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_CHISQR)
+        dist_Intersection[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_INTERSECT)
+        dist_Bhattacharyya[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_BHATTACHARYYA)
+        dist_Hellinger[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_HELLINGER)
+        dist_ChiSquareAlt[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_CHISQR_ALT)
+        dist_KLDiv[index] = cv2.compareHist(histUV,histUV_old,cv2.HISTCMP_KL_DIV)
 
     k = cv2.waitKey(30) & 0xff
     if k == 27:
@@ -66,6 +79,17 @@ while(ret):
     ret,frame = cap.read()
     if (frame==[]):
         print("The end")
+
+plt.plot(X,dist_Correl, label = "Correlation")
+plt.plot(X,dist_ChiSquare, label = "ChiSquare")
+plt.plot(X,dist_Intersection, label = "Intersection")
+plt.plot(X,dist_Bhattacharyya, label = "Bhattacharyya")
+plt.plot(X,dist_Hellinger, label = "Hellinger")
+plt.plot(X,dist_ChiSquareAlt, label = "ChiSquareAlt")
+plt.plot(X,dist_KLDiv, label = "KLDiv")
+plt.legend()
+plt.title("All possible distances in compareHist")
+plt.show()
 
 
 cv2.destroyAllWindows()
