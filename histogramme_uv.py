@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Nov  5 11:14:50 2020
-
-@author: iad
 """
 
 
@@ -19,27 +17,27 @@ nVal = 256
 histogrammeUV = np.zeros((nVal,nVal))
 cap = cv2.VideoCapture(directory+filename)
 
+ret,frame = cap.read()
 index = 0
 ret = True
 while(ret):
-    ret,frame = cap.read()
     frame_Yuv = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
     #frame_uv = frame_Yuv[:,:,1:]
-    index += 1
-    for i in range (0,nVal):
-        for j in range (0,nVal):
-            goodU = (frame_Yuv[:,:,1] == i)
-            goodUgoodV = (frame_Yuv[:,:,1]
-            
-            histogrammeUV[i][j] = np.count_nonzero(frame_uv[:][:] == [i,j])
     
+    histogrammeUV = cv2.calcHist([frame_Yuv],[1,2], None, [256,256], [0,256,0,256])
     
+    #print(frame_Yuv.shape)
     cv2.imshow('test affichage',frame_Yuv)
+    cv2.imshow('histogramme',histogrammeUV)
+    
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
     elif k == ord('s'):
-        cv2.imwrite('OF_PyrLk%04d.png'%index,img)
+        cv2.imwrite('image%04d.png'%index,frame)
+        cv2.imwrite('hist%04d.png'%index,histogrammeUV)
+    index += 1
+    ret,frame = cap.read()
 
 
 cv2.destroyAllWindows()
