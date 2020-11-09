@@ -7,10 +7,12 @@ Created on Thu Nov  5 11:14:50 2020
 
 import numpy as np
 import cv2
+import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
+#directory = './TP2_Videos/
 nVal = 256
 #nValU = nVal
 #nValV = nVal
@@ -36,6 +38,10 @@ while(ret):
     elif k == ord('s'):
         cv2.imwrite('image%04d.png'%index,frame)
         cv2.imwrite('hist%04d.png'%index,histogrammeUV)
+    elif k == ord('p'):
+        while k != ord('g'):
+            time.sleep(1)
+            k = cv2.waitKey(30) & 0xff
     index += 1
     ret,frame = cap.read()
 
