@@ -39,9 +39,9 @@ while(ret):
     HumanVisibleHistogrammeUV[2::3,1::3] = histogrammeUV
     HumanVisibleHistogrammeUV[2::3,2::3] = histogrammeUV
     
+    #print(frame_Yuv.shape)
     cv2.imshow('test affichage',frame_Yuv)
-    cv2.imshow('histogramme',histogrammeUV/(histogrammeUV.max()-histogrammeUV.min()))
-    cv2.imshow('histogramme visible by human',HumanVisibleHistogrammeUV/(HumanVisibleHistogrammeUV.max()-HumanVisibleHistogrammeUV.min()))
+    cv2.imshow('histogramme',histogrammeUV)
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
