@@ -28,9 +28,8 @@ while(ret):
     
     histogrammeUV = cv2.calcHist([frame_Yuv],[1,2], None, [256,256], [0,256,0,256])
     
-    #print(frame_Yuv.shape)
     cv2.imshow('test affichage',frame_Yuv)
-    cv2.imshow('histogramme',histogrammeUV)
+    cv2.imshow('histogramme',histogrammeUV/(histogrammeUV.max()-histogrammeUV.min()))
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
