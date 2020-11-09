@@ -27,9 +27,21 @@ while(ret):
     #frame_uv = frame_Yuv[:,:,1:]
     
     histogrammeUV = cv2.calcHist([frame_Yuv],[1,2], None, [256,256], [0,256,0,256])
+    histShape = np.shape(histogrammeUV)
+    HumanVisibleHistogrammeUV = np.zeros((histShape[0]*3,histShape[1]*3))
+    HumanVisibleHistogrammeUV[0::3,0::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[0::3,1::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[0::3,2::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[1::3,0::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[1::3,1::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[1::3,2::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[2::3,0::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[2::3,1::3] = histogrammeUV
+    HumanVisibleHistogrammeUV[2::3,2::3] = histogrammeUV
     
     cv2.imshow('test affichage',frame_Yuv)
     cv2.imshow('histogramme',histogrammeUV/(histogrammeUV.max()-histogrammeUV.min()))
+    cv2.imshow('histogramme visible by human',HumanVisibleHistogrammeUV/(HumanVisibleHistogrammeUV.max()-HumanVisibleHistogrammeUV.min()))
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
