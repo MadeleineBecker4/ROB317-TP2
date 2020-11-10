@@ -12,10 +12,11 @@ import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
-#directory = '../TP2_Videos_Exemples/'
-directory = './TP2_Videos/'
+directory = '../TP2_Videos_Exemples/'
+#directory = './TP2_Videos/'
 nVal = 256
 nbImages = 3168
+nFrame
 #nValU = nVal
 #nValV = nVal
 histUV = np.zeros((nVal,nVal))
@@ -77,18 +78,41 @@ while(ret):
     index += 1
     histUV_old = histUV
     ret,frame = cap.read()
-    if (frame==[]):
+    if !(ret):
         print("The end")
 
-plt.plot(X,dist_Correl, label = "Correlation")
-plt.plot(X,dist_ChiSquare, label = "ChiSquare")
-plt.plot(X,dist_Intersection, label = "Intersection")
-plt.plot(X,dist_Bhattacharyya, label = "Bhattacharyya")
-plt.plot(X,dist_Hellinger, label = "Hellinger")
-plt.plot(X,dist_ChiSquareAlt, label = "ChiSquareAlt")
-plt.plot(X,dist_KLDiv, label = "KLDiv")
+renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
+renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
+renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
+renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
+renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
+renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
+renorm_dist_KLDiv = dist_Correl/dist_KLDiv.max()
+
+'''
+renorm_moy_dist = (renorm_dist_Correl + \
+                   renorm_dist_ChiSquare + \
+                   renorm_dist_Intersection + \ 
+                   renorm_dist_Bhattacharyya + \
+                   renorm_dist_Hellinger + \
+                   renorm_dist_ChiSquareAlt + \
+                   renorm_dist_KLDiv)/7
+'''
+renorm_moy_dist = (renorm_dist_Correl +renorm_dist_ChiSquare +  renorm_dist_Intersection + renorm_dist_Bhattacharyya +  renorm_dist_Hellinger + renorm_dist_ChiSquareAlt + renorm_dist_KLDiv)/7
+
+plt.plot(X,renorm_dist_Correl, label = "Correlation")
+plt.plot(X,renorm_dist_ChiSquare, label = "ChiSquare")
+#plt.plot(X,renorm_dist_Intersection, label = "Intersection")
+#plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
+#plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
+#plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
+plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
 plt.legend()
 plt.title("All possible distances in compareHist")
+plt.show()
+
+plt.plot(X,renorm_moy_dist)
+plt.title("moy dist")
 plt.show()
 
 
