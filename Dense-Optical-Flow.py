@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 #Ouverture du flux video
-cap = cv2.VideoCapture("../Vidéos/Extrait1-Cosmos_Laundromat1(340p).m4v")
+cap = cv2.VideoCapture("./TP2_Videos/Extrait1-Cosmos_Laundromat1(340p).m4v")
 
 ret, frame1 = cap.read() # Passe à l'image suivante
 prvs = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY) # Passage en niveaux de gris
@@ -29,7 +29,7 @@ while(ret):
 
     bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
     result = np.vstack((frame2,bgr))
-    cv2.imshow('Image et Champ de vitesses (Farnebäck)',result)
+    cv2.imshow('Image et Champ de vitesses (Farneback)',result.astype(np.uint8))
     k = cv2.waitKey(15) & 0xff
     if k == 27:
         break
