@@ -12,8 +12,10 @@ import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
-#directory = '../TP2_Videos_Exemples/'
-directory = './TP2_Videos/'
+directory = '../TP2_Videos_Exemples/'
+#directory = './TP2_Videos/'
+#imgDir = '../figure/'
+imgDir = './'
 nVal = 256
 nbImages = 3168
 nbFrames = 10
@@ -21,7 +23,7 @@ nbFrames = 10
 #nValV = nVal
 histUV = np.zeros((nVal, nVal))
 histUV_old = np.zeros((nVal, nVal))
-buffHist = np.zeros((nbFrames, nVal, nVal))
+buffHist = np.zeros((nbFrames, nVal, nVal), dtype=np.float32)
 cap = cv2.VideoCapture(directory+filename)
 
 dist_Correl = np.zeros(nbImages)
@@ -77,7 +79,7 @@ while(ret):
         dist_Correl = cv2.compareHist(histPrev, histNext, cv2.HISTCMP_CORREL)
         if dist_Correl>0.3:
             print(dist_Correl)
-            cv2.imwrite('image%04d.png' % index, frame)
+            cv2.imwrite(imgDir+'image%04d.png' % index, frame)
 
     # if index > 0:
     #     
