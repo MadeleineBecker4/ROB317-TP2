@@ -12,13 +12,13 @@ import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
-directory = '../TP2_Videos_Exemples/'
-#directory = './TP2_Videos/'
+#directory = '../TP2_Videos_Exemples/'
+directory = './TP2_Videos/'
 #imgDir = '../figure/'
-imgDir = './'
+imgDir = './Images/'
 nVal = 256
 nbImages = 3168
-nbFrames = 10
+nbFrames = 50
 #nValU = nVal
 #nValV = nVal
 histUV = np.zeros((nVal, nVal))
@@ -27,12 +27,12 @@ buffHist = np.zeros((nbFrames, nVal, nVal), dtype=np.float32)
 cap = cv2.VideoCapture(directory+filename)
 
 dist_Correl = np.zeros(nbImages)
-dist_ChiSquare = np.zeros(nbImages)
-dist_Intersection = np.zeros(nbImages)
-dist_Bhattacharyya = np.zeros(nbImages)
-dist_Hellinger = np.zeros(nbImages)
-dist_ChiSquareAlt = np.zeros(nbImages)
-dist_KLDiv = np.zeros(nbImages)
+# dist_ChiSquare = np.zeros(nbImages)
+# dist_Intersection = np.zeros(nbImages)
+# dist_Bhattacharyya = np.zeros(nbImages)
+# dist_Hellinger = np.zeros(nbImages)
+# dist_ChiSquareAlt = np.zeros(nbImages)
+# dist_KLDiv = np.zeros(nbImages)
 X = np.arange(nbImages)
 
 ret, frame = cap.read()
@@ -62,24 +62,18 @@ while(ret):
                (HumanVisibleHistogrammeUV.max()-HumanVisibleHistogrammeUV.min()))
 
     if index > 10:
-        # histPrev = np.zeros_like(histUV)
-        # histNext = np.zeros_like(histUV)
-        # N = nbFrames//2
-        # for j in range(N):
-        #     histPrev = histPrev + buffHist[j]
-        #     histNext = histNext + buffHist[j+N]
-        # print(histPrev.shape)
-        # print(histPrev.max())
-        histPrev = buffHist[0,:,:]+buffHist[1,:,:]+buffHist[2,:,:]+buffHist[3,:,:]+buffHist[4,:,:]
-        histNext = buffHist[5,:,:]+buffHist[6,:,:]+buffHist[7,:,:]+buffHist[8,:,:]+buffHist[9,:,:]
-        print(histNext.shape)
-        print(histNext.max())
-        print(histNext)
-
-        dist_Correl = cv2.compareHist(histPrev, histNext, cv2.HISTCMP_CORREL)
-        if dist_Correl>0.3:
-            print(dist_Correl)
+        histPrev = np.zeros_like(histUV)
+        histNext = np.zeros_like(histUV)
+        N = nbFrames//2
+        for j in range(N):
+            histPrev = histPrev + buffHist[j]
+            histNext = histNext + buffHist[j+N]
+        # histPrev = buffHist[0,:,:]+buffHist[1,:,:]+buffHist[2,:,:]+buffHist[3,:,:]+buffHist[4,:,:]
+        # histNext = buffHist[5,:,:]+buffHist[6,:,:]+buffHist[7,:,:]+buffHist[8,:,:]+buffHist[9,:,:]
+        dist_Correl[index] = cv2.compareHist(histPrev, histNext, cv2.HISTCMP_CORREL)
+        if dist_Correl[index]<0.65:
             cv2.imwrite(imgDir+'image%04d.png' % index, frame)
+            print(dist_Correl[index])
 
     # if index > 0:
     #     
@@ -112,41 +106,44 @@ while(ret):
     if not(ret):
         print("The end")
 
-renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
-renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
-renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
-renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
-renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
-renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
-renorm_dist_KLDiv = dist_Correl/dist_KLDiv.max()
+# renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
+# renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
+# renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
+# renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
+# renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
+# renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
+# renorm_dist_KLDiv = dist_Correl/dist_KLDiv.max()
 
-'''
-renorm_moy_dist = (renorm_dist_Correl + \
-                   renorm_dist_ChiSquare + \
-                   renorm_dist_Intersection + \ 
-                   renorm_dist_Bhattacharyya + \
-                   renorm_dist_Hellinger + \
-                   renorm_dist_ChiSquareAlt + \
-                   renorm_dist_KLDiv)/7
-'''
-renorm_moy_dist = (renorm_dist_Correl + renorm_dist_ChiSquare + renorm_dist_Intersection +
-                   renorm_dist_Bhattacharyya + renorm_dist_Hellinger + renorm_dist_ChiSquareAlt + renorm_dist_KLDiv)/7
+# '''
+# renorm_moy_dist = (renorm_dist_Correl + \
+#                    renorm_dist_ChiSquare + \
+#                    renorm_dist_Intersection + \ 
+#                    renorm_dist_Bhattacharyya + \
+#                    renorm_dist_Hellinger + \
+#                    renorm_dist_ChiSquareAlt + \
+#                    renorm_dist_KLDiv)/7
+# '''
+# renorm_moy_dist = (renorm_dist_Correl + renorm_dist_ChiSquare + renorm_dist_Intersection +
+#                    renorm_dist_Bhattacharyya + renorm_dist_Hellinger + renorm_dist_ChiSquareAlt + renorm_dist_KLDiv)/7
 
-plt.plot(X, renorm_dist_Correl, label="Correlation")
-plt.plot(X, renorm_dist_ChiSquare, label="ChiSquare")
-#plt.plot(X,renorm_dist_Intersection, label = "Intersection")
-#plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
-#plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
-#plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
-plt.plot(X, renorm_dist_KLDiv, label="KLDiv")
-plt.legend()
-plt.title("All possible distances in compareHist")
+# plt.plot(X, renorm_dist_Correl, label="Correlation")
+# plt.plot(X, renorm_dist_ChiSquare, label="ChiSquare")
+# #plt.plot(X,renorm_dist_Intersection, label = "Intersection")
+# #plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
+# #plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
+# #plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
+# plt.plot(X, renorm_dist_KLDiv, label="KLDiv")
+# plt.legend()
+# plt.title("All possible distances in compareHist")
+# plt.show()
+
+# plt.plot(X, renorm_moy_dist)
+# plt.title("moy dist")
+# plt.show()
+
+plt.plot(X,dist_Correl)
+plt.title("Correlation des histogrammes")
 plt.show()
-
-plt.plot(X, renorm_moy_dist)
-plt.title("moy dist")
-plt.show()
-
 
 cv2.destroyAllWindows()
 cap.release()
