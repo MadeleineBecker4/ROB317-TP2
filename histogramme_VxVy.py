@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 10 14:43:42 2020
-
-@author: iad
+Created on Thu Nov  5 11:14:50 2020
 """
+
 
 import numpy as np
 import cv2
@@ -78,7 +77,7 @@ while(ret):
     index += 1
     histUV_old = histUV
     ret,frame = cap.read()
-    if !(ret):
+    if not(ret):
         print("The end")
 
 renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
