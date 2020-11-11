@@ -14,7 +14,7 @@ filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
 #directory = './TP2_Videos/'
-# indice de la frame juste avant une coupure
+# indice de la frame juste apres une coupure
 coupureVeriteTerrain = [31,200,1000]
 histSize = 21 # impaire
 nbImages = 3168 # nombre de frame de la video
