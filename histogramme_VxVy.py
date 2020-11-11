@@ -42,12 +42,11 @@ prvs_frame = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY) # Passage en niveaux de gri
 hsv = np.zeros_like(frame1) # Image nulle de même taille que frame1 (affichage OF)
 hsv[:,:,1] = 255 # Toutes les couleurs sont saturées au maximum
 
-index = 1
+index = 0
 ret, frame2 = cap.read()
 next_frame = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY) 
 
 while(ret):
-    index += 1
     flow = cv2.calcOpticalFlowFarneback(prvs_frame,next_frame,None, 
                                         pyr_scale = 0.5,# Taux de réduction pyramidal
                                         levels = 3, # Nombre de niveaux de la pyramide
@@ -69,6 +68,15 @@ while(ret):
     affichagehistVxVy = np.sqrt(histVxVy/(histVxVy.max()-histVxVy.min()))
     cv2.imshow('histogramme',affichagehistVxVy)
 
+    if index>0:
+        dist_Correl[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CORREL)
+        dist_ChiSquare[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CHISQR)
+        dist_Intersection[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_INTERSECT)
+        dist_Bhattacharyya[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_BHATTACHARYYA)
+        dist_Hellinger[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_HELLINGER)
+        dist_ChiSquareAlt[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CHISQR_ALT)
+        dist_KLDiv[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_KL_DIV)
+
 
     bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
     result = np.vstack((frame2,bgr))
@@ -84,7 +92,9 @@ while(ret):
             time.sleep(1)
             k = cv2.waitKey(30) & 0xff
     prvs_frame = next_frame
+    histVxVy_old = histVxVy
     ret, frame2 = cap.read()
+    index += 1
     if (ret):
         next_frame = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY) 
 
@@ -99,24 +109,24 @@ plt.plot(X,VyMin,label = "VyMin")
 plt.legend()
 plt.show()
 
+renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
+renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
+renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
+renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
+renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
+renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
+renorm_dist_KLDiv = dist_Correl/dist_KLDiv.max()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+plt.plot(X,renorm_dist_Correl, label = "Correlation")
+plt.plot(X,renorm_dist_ChiSquare, label = "ChiSquare")
+#plt.plot(X,renorm_dist_Intersection, label = "Intersection")
+#plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
+#plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
+#plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
+plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
+plt.legend()
+plt.title("All possible distances in compareHist")
+plt.show()
 
 
 
