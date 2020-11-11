@@ -65,8 +65,9 @@ while(ret):
     VyMax[index] = flow[:,:,1].max()
     VyMin[index] = flow[:,:,1].min()
     
-    histVxVy = cv2.calcHist([flow],[0,1], None, [256,256], [-20,20,-20,20])
-    cv2.imshow('histogramme',histVxVy/(histVxVy.max()-histVxVy.min()))
+    histVxVy = cv2.calcHist([flow],[0,1], None, [20,20], [-20,20,-20,20])
+    affichagehistVxVy = np.sqrt(histVxVy/(histVxVy.max()-histVxVy.min()))
+    cv2.imshow('histogramme',affichagehistVxVy)
 
 
     bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
