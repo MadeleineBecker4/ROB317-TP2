@@ -50,8 +50,6 @@ VyMax = np.zeros(nbImages)
 VyMin = np.zeros(nbImages)
 
 
-
-
 ret, frame1 = cap.read() # Passe à l'image suivante
 prvs_frame = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY) # Passage en niveaux de gris
 hsv = np.zeros_like(frame1) # Image nulle de même taille que frame1 (affichage OF)
@@ -126,10 +124,13 @@ while(ret):
 cv2.destroyAllWindows()
 cap.release()
 
+
 plt.plot(X,VxMax,label = "VxMax")
 plt.plot(X,VxMin,label = "VxMin")
 plt.plot(X,VyMax,label = "VyMax")
 plt.plot(X,VyMin,label = "VyMin")
+for idx in coupureVeriteTerrain:
+    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.show()
 
@@ -150,9 +151,6 @@ renorm_dist_ChiSquareAlt_static = dist_ChiSquareAlt_static/dist_ChiSquareAlt_sta
 renorm_dist_KLDiv_static = dist_KLDiv_static/dist_KLDiv_static.max()
 
 
-
-
-
 plt.plot(X,renorm_dist_Correl, label = "Correlation")
 plt.plot(X,renorm_dist_ChiSquare, label = "ChiSquare")
 plt.plot(X,renorm_dist_Intersection, label = "Intersection")
@@ -160,6 +158,8 @@ plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
+for idx in coupureVeriteTerrain:
+    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
@@ -171,6 +171,8 @@ plt.plot(X,renorm_dist_Bhattacharyya_static, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger_static, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt_static, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv_static, label = "KLDiv")
+for idx in coupureVeriteTerrain:
+    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
