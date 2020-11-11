@@ -15,8 +15,8 @@ import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
-#directory = '../TP2_Videos_Exemples/'
-directory = './TP2_Videos/'
+directory = '../TP2_Videos_Exemples/'
+#directory = './TP2_Videos/'
 #imgDir = '../figure/'
 imgDir = './Images/'
 
@@ -27,7 +27,7 @@ nbFrames = 50
 cap = cv2.VideoCapture(directory+filename)
 
 ret, frame = cap.read()
-buffFrames = np.zeros((nbFrames, frame.shape[0], frame.shape[1], frame.shape[2]), dtype=np.float32)
+buffFrames = np.zeros((nbFrames, frame.shape[0], frame.shape[1], frame.shape[2]), dtype=np.uint8)
 
 index = 0
 while(ret):
