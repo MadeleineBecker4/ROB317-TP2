@@ -14,11 +14,14 @@ filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
 #directory = './TP2_Videos/'
-nVal = 256
-nbImages = 3168
+histSize = 21 # impaire
+nbImages = 3168 # nombre de frame de la video
 
-histVxVy = np.zeros((nVal,nVal))
-#histVxVy_old = np.zeros((nVal,nVal))
+histVxVy = np.zeros((histSize,histSize))
+# histogramme obtenue pour une scene statique
+histStatic = np.zeros((histSize, histSize), dtype=np.float32)
+histStatic[histSize//2,histSize//2] = 1.
+
 cap = cv2.VideoCapture(directory+filename)
 
 dist_Correl = np.zeros(nbImages)
@@ -28,12 +31,22 @@ dist_Bhattacharyya = np.zeros(nbImages)
 dist_Hellinger = np.zeros(nbImages)
 dist_ChiSquareAlt = np.zeros(nbImages)
 dist_KLDiv = np.zeros(nbImages)
+
+dist_Correl_static = np.zeros(nbImages)
+dist_ChiSquare_static = np.zeros(nbImages)
+dist_Intersection_static = np.zeros(nbImages)
+dist_Bhattacharyya_static = np.zeros(nbImages)
+dist_Hellinger_static = np.zeros(nbImages)
+dist_ChiSquareAlt_static = np.zeros(nbImages)
+dist_KLDiv_static = np.zeros(nbImages)
+
 X = np.arange(nbImages)
 
 VxMax = np.zeros(nbImages)
 VxMin = np.zeros(nbImages)
 VyMax = np.zeros(nbImages)
 VyMin = np.zeros(nbImages)
+
 
 
 
@@ -64,10 +77,11 @@ while(ret):
     VyMax[index] = flow[:,:,1].max()
     VyMin[index] = flow[:,:,1].min()
     
-    histVxVy = cv2.calcHist([flow],[0,1], None, [20,20], [-20,20,-20,20])
+    histVxVy = cv2.calcHist([flow],[0,1], None, [histSize,histSize], [-20,20,-20,20])
     affichagehistVxVy = np.sqrt(histVxVy/(histVxVy.max()-histVxVy.min()))
     cv2.imshow('histogramme',affichagehistVxVy)
 
+    # distance entre deux histogramme de vistesse consecutif
     if index>0:
         dist_Correl[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CORREL)
         dist_ChiSquare[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CHISQR)
@@ -76,7 +90,15 @@ while(ret):
         dist_Hellinger[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_HELLINGER)
         dist_ChiSquareAlt[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_CHISQR_ALT)
         dist_KLDiv[index] = cv2.compareHist(histVxVy,histVxVy_old,cv2.HISTCMP_KL_DIV)
-
+    # distance entre l'hisogramme de vitesse actuelle et l'histogramme de
+    # vitesse d'une scene completement statique
+    dist_Correl_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_CORREL)
+    dist_ChiSquare_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_CHISQR)
+    dist_Intersection_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_INTERSECT)
+    dist_Bhattacharyya_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_BHATTACHARYYA)
+    dist_Hellinger_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_HELLINGER)
+    dist_ChiSquareAlt_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_CHISQR_ALT)
+    dist_KLDiv_static[index] = cv2.compareHist(histVxVy,histStatic,cv2.HISTCMP_KL_DIV)
 
     bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
     result = np.vstack((frame2,bgr))
@@ -115,20 +137,37 @@ renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
 renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
 renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
 renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
-renorm_dist_KLDiv = dist_Correl/dist_KLDiv.max()
+renorm_dist_KLDiv = dist_KLDiv/dist_KLDiv.max()
+
+renorm_dist_Correl_static = 1-dist_Correl_static/dist_Correl_static.max()
+renorm_dist_ChiSquare_static = dist_ChiSquare_static/dist_ChiSquare_static.max()
+renorm_dist_Intersection_static = 1-dist_Intersection_static/dist_Intersection_static.max()
+renorm_dist_Bhattacharyya_static = dist_Bhattacharyya_static/dist_Bhattacharyya_static.max()
+renorm_dist_Hellinger_static = dist_Hellinger_static/dist_Hellinger_static.max()
+renorm_dist_ChiSquareAlt_static = dist_ChiSquareAlt_static/dist_ChiSquareAlt_static.max()
+renorm_dist_KLDiv_static = dist_KLDiv_static/dist_KLDiv_static.max()
 
 plt.plot(X,renorm_dist_Correl, label = "Correlation")
 plt.plot(X,renorm_dist_ChiSquare, label = "ChiSquare")
-#plt.plot(X,renorm_dist_Intersection, label = "Intersection")
-#plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
-#plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
-#plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
+plt.plot(X,renorm_dist_Intersection, label = "Intersection")
+plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
+plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
+plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
 plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
 
-
+plt.plot(X,renorm_dist_Correl_static, label = "Correlation")
+plt.plot(X,renorm_dist_ChiSquare_static, label = "ChiSquare")
+plt.plot(X,renorm_dist_Intersection_static, label = "Intersection")
+plt.plot(X,renorm_dist_Bhattacharyya_static, label = "Bhattacharyya")
+plt.plot(X,renorm_dist_Hellinger_static, label = "Hellinger")
+plt.plot(X,renorm_dist_ChiSquareAlt_static, label = "ChiSquareAlt")
+plt.plot(X,renorm_dist_KLDiv_static, label = "KLDiv")
+plt.legend()
+plt.title("All possible distances in compareHist")
+plt.show()
 
 
 
