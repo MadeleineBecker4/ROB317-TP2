@@ -9,13 +9,14 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import time
+import auxFucntion as af
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
 #directory = './TP2_Videos/'
 # indice de la frame juste apres une coupure
-coupureVeriteTerrain = [31,200,1000]
+cutGroundTruth = af.getCutGroundTruth(filename) 
 histSize = 21 # impaire
 nbImages = 3168 # nombre de frame de la video
 
@@ -129,7 +130,7 @@ plt.plot(X,VxMax,label = "VxMax")
 plt.plot(X,VxMin,label = "VxMin")
 plt.plot(X,VyMax,label = "VyMax")
 plt.plot(X,VyMin,label = "VyMin")
-for idx in coupureVeriteTerrain:
+for idx in cutGroundTruth:
     plt.axvline(x=idx, color='k')
 plt.legend()
 plt.show()
@@ -158,7 +159,7 @@ plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
-for idx in coupureVeriteTerrain:
+for idx in cutGroundTruth:
     plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
@@ -171,7 +172,7 @@ plt.plot(X,renorm_dist_Bhattacharyya_static, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger_static, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt_static, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv_static, label = "KLDiv")
-for idx in coupureVeriteTerrain:
+for idx in cutGroundTruth:
     plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
