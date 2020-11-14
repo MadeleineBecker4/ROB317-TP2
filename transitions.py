@@ -15,8 +15,8 @@ import time
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
-directory = '../TP2_Videos_Exemples/'
-#directory = './TP2_Videos/'
+#directory = '../TP2_Videos_Exemples/'
+directory = './TP2_Videos/'
 #imgDir = '../figure/'
 imgDir = './Images/'
 
