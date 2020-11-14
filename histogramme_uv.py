@@ -32,12 +32,12 @@ buffHist = np.zeros((nbFrames, nVal, nVal), dtype=np.float32)
 cap = cv2.VideoCapture(directory+filename)
 
 dist_Correl = np.zeros(nbImages)
-# dist_ChiSquare = np.zeros(nbImages)
-# dist_Intersection = np.zeros(nbImages)
-# dist_Bhattacharyya = np.zeros(nbImages)
-# dist_Hellinger = np.zeros(nbImages)
-# dist_ChiSquareAlt = np.zeros(nbImages)
-# dist_KLDiv = np.zeros(nbImages)
+dist_ChiSquare = np.zeros(nbImages)
+dist_Intersection = np.zeros(nbImages)
+dist_Bhattacharyya = np.zeros(nbImages)
+dist_Hellinger = np.zeros(nbImages)
+dist_ChiSquareAlt = np.zeros(nbImages)
+dist_KLDiv = np.zeros(nbImages)
 X = np.arange(nbImages)
 
 ret, frame = cap.read()
@@ -77,49 +77,49 @@ while(ret):
 
     #Pour pouvoir calculer la moyenne glissante, il faut que suffisamment 
     #d'histogrammes aient ete calcules
-    if index > nbFrames:
+    # if index > nbFrames:
 
         #Calcul de la moyenne des histogrammes precedents et suivants la transition
         #etudiee. On etudie la transition au milieu des histogrammes sauvegardes.
         #Pour eviter de devoir decaler les histogrammes a chaque pas de temps, 
         #on les sauvegarde a la position index%nbFrames. Cela necessite une petite
         #manipulation au moment du calcul des moyennes.
-        histPrev = np.zeros_like(histUV)
-        histNext = np.zeros_like(histUV)
-        N = nbFrames//2
-        offset = index%nbFrames +1
-        for j in range(N):
-            histPrev = histPrev + buffHist[(offset+j)%nbFrames]
-            histNext = histNext + buffHist[(offset+N+j)%nbFrames]
+        # histPrev = np.zeros_like(histUV)
+        # histNext = np.zeros_like(histUV)
+        # N = nbFrames//2
+        # offset = index%nbFrames +1
+        # for j in range(N):
+        #     histPrev = histPrev + buffHist[(offset+j)%nbFrames]
+        #     histNext = histNext + buffHist[(offset+N+j)%nbFrames]
 
         #Calcul de la distance entre les deux moyennes
-        dist_Correl[index] = cv2.compareHist(histPrev, histNext, cv2.HISTCMP_CORREL)
+        # dist_Correl[index] = cv2.compareHist(histPrev, histNext, cv2.HISTCMP_CORREL)
 
         #Calcul de la distance entre deux histogrammes successifs
         #dist_Correl[index] = cv2.compareHist(histUV, histUV_old, cv2.HISTCMP_CORREL)
 
         #Si les images sont considerees comme des transitions, elles sont enregistrees,
         #et les distances sont affichees dans la console
-        if dist_Correl[index]<seuil:
-            cv2.imwrite(imgDir+'image%04d.png' % index, frame)
-            print(dist_Correl[index])
+        # if dist_Correl[index]<seuil:
+        #     cv2.imwrite(imgDir+'image%04d.png' % index, frame)
+        #     print(dist_Correl[index])
 
     # Calul des distances entre deux histogrammes successifs pour toutes les distances 
     # disponibles dans la fonction cv2.compareHist
-    # if index > 0:
-    #     dist_Correl[index] = cv2.compareHist(histUV, histUV_old, cv2.HISTCMP_CORREL)
-    #     dist_ChiSquare[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_CHISQR)
-    #     dist_Intersection[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_INTERSECT)
-    #     dist_Bhattacharyya[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_BHATTACHARYYA)
-    #     dist_Hellinger[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_HELLINGER)
-    #     dist_ChiSquareAlt[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_CHISQR_ALT)
-    #     dist_KLDiv[index] = cv2.compareHist(
-    #         histUV, histUV_old, cv2.HISTCMP_KL_DIV)
+    if index > 0:
+        dist_Correl[index] = cv2.compareHist(histUV, histUV_old, cv2.HISTCMP_CORREL)
+        dist_ChiSquare[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_CHISQR)
+        dist_Intersection[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_INTERSECT)
+        dist_Bhattacharyya[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_BHATTACHARYYA)
+        dist_Hellinger[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_HELLINGER)
+        dist_ChiSquareAlt[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_CHISQR_ALT)
+        dist_KLDiv[index] = cv2.compareHist(
+            histUV, histUV_old, cv2.HISTCMP_KL_DIV)
 
     k = cv2.waitKey(30) & 0xff
     if k == 27:
@@ -146,13 +146,13 @@ while(ret):
 # Les distances ne sont pas du tout normalisees, donc pour les comparer on les normalise 
 # entre 0 histgrammes identiques et 1 distance maximale entre deux histogrammes de la video
 
-# renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
-# renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
-# renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
-# renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
-# renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
-# renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
-# renorm_dist_KLDiv = dist_KLDiv/dist_KLDiv.max()
+renorm_dist_Correl = 1-dist_Correl/dist_Correl.max()
+renorm_dist_ChiSquare = dist_ChiSquare/dist_ChiSquare.max()
+renorm_dist_Intersection = 1-dist_Intersection/dist_Intersection.max()
+renorm_dist_Bhattacharyya = dist_Bhattacharyya/dist_Bhattacharyya.max()
+renorm_dist_Hellinger = dist_Hellinger/dist_Hellinger.max()
+renorm_dist_ChiSquareAlt = dist_ChiSquareAlt/dist_ChiSquareAlt.max()
+renorm_dist_KLDiv = dist_KLDiv/dist_KLDiv.max()
 
 # '''
 # renorm_moy_dist = (renorm_dist_Correl + \
@@ -170,24 +170,24 @@ while(ret):
 # Affichage des distances entre histogrammes pour toutes les distances disponibles 
 # dans la fonction cv2.compareHist
 
-# plt.plot(X, renorm_dist_Correl, label="Correlation")
-# plt.plot(X, renorm_dist_ChiSquare, label="ChiSquare")
-# #plt.plot(X,renorm_dist_Intersection, label = "Intersection")
-# #plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
-# #plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
-# #plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
-# plt.plot(X, renorm_dist_KLDiv, label="KLDiv")
-# plt.legend()
-# plt.title("All possible distances in compareHist")
-# plt.show()
+plt.plot(X, renorm_dist_Correl, label="Correlation")
+plt.plot(X, renorm_dist_ChiSquare, label="ChiSquare")
+# plt.plot(X,renorm_dist_Intersection, label = "Intersection")
+# plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
+# plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
+# plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
+plt.plot(X, renorm_dist_KLDiv, label="KLDiv")
+plt.legend()
+plt.title("All possible distances in compareHist")
+plt.show()
 
 # plt.plot(X, renorm_moy_dist)
 # plt.title("moy dist")
 # plt.show()
 
-plt.plot(X,dist_Correl)
-plt.title("Correlation des histogrammes")
-plt.show()
+# plt.plot(X,dist_Correl)
+# plt.title("Correlation des histogrammes")
+# plt.show()
 
 cv2.destroyAllWindows()
 cap.release()
