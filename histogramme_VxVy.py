@@ -11,16 +11,20 @@ import matplotlib.pyplot as plt
 import time
 import auxFunctions as af
 
-filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
+filename = 'ZOOM_O_TRAVELLING.m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
 #directory = './TP2_Videos/'
+imgDir = '../figure/newfig/'
+#imgDir = './Images/'
 # indice de la frame juste apres une coupure
 cutGroundTruth = af.getCutGroundTruth(filename) 
-histSize = 21 # impaire
-nbImages = 3168 # nombre de frame de la video
+histSize = 61 # impaire
+nbImages = af.getNbFrame(filename,100000) # nombre de frame de la video
 
 histVxVy = np.zeros((histSize,histSize))
+histShape = np.shape(histVxVy)
+zoomHistVxVy = np.zeros((histShape[0]*3, histShape[1]*3))
 # histogramme obtenue pour une scene statique
 histStatic = np.zeros((histSize, histSize), dtype=np.float32)
 histStatic[histSize//2,histSize//2] = 1.
@@ -79,8 +83,21 @@ while(ret):
     VyMin[index] = flow[:,:,1].min()
     
     histVxVy = cv2.calcHist([flow],[0,1], None, [histSize,histSize], [-20,20,-20,20])
-    affichagehistVxVy = np.sqrt(histVxVy/(histVxVy.max()-histVxVy.min()))
-    cv2.imshow('histogramme',affichagehistVxVy)
+    
+    zoomHistVxVy[0::3, 0::3] = histVxVy
+    zoomHistVxVy[0::3, 1::3] = histVxVy
+    zoomHistVxVy[0::3, 2::3] = histVxVy
+    zoomHistVxVy[1::3, 0::3] = histVxVy
+    zoomHistVxVy[1::3, 1::3] = histVxVy
+    zoomHistVxVy[1::3, 2::3] = histVxVy
+    zoomHistVxVy[2::3, 0::3] = histVxVy
+    zoomHistVxVy[2::3, 1::3] = histVxVy
+    zoomHistVxVy[2::3, 2::3] = histVxVy
+    
+    normalizedHistVxVy = zoomHistVxVy/(zoomHistVxVy.max()-zoomHistVxVy.min())
+    sqrtHistVxVy = np.sqrt(normalizedHistVxVy)
+    cv2.imshow('histogramme',normalizedHistVxVy)
+    cv2.imshow('sqrt(histogramme)',sqrtHistVxVy)
 
     # distance entre deux histogramme de vistesse consecutif
     if index>0:
@@ -108,8 +125,10 @@ while(ret):
     if k == 27:
         break
     elif k == ord('s'):
-        cv2.imwrite('Frame_%04d.png'%index,frame2)
-        cv2.imwrite('OF_hsv_%04d.png'%index,bgr)
+        cv2.imwrite(imgDir+'Frame_%04d.png'%index,frame2)
+        cv2.imwrite(imgDir+'OF_hsv_%04d.png'%index,bgr)
+        cv2.imwrite(imgDir+'zoom_normalizedHistVxVy%04d.png' % index, normalizedHistVxVy*255)
+        cv2.imwrite(imgDir+'zoom_sqrtHistVxVy%04d.png' % index, sqrtHistVxVy*255)
     elif k == ord('p'):
         while k != ord('g'):
             time.sleep(1)
@@ -125,13 +144,13 @@ while(ret):
 cv2.destroyAllWindows()
 cap.release()
 
-
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
 plt.plot(X,VxMax,label = "VxMax")
 plt.plot(X,VxMin,label = "VxMin")
 plt.plot(X,VyMax,label = "VyMax")
 plt.plot(X,VyMin,label = "VyMin")
-for idx in cutGroundTruth:
-    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.show()
 
@@ -151,7 +170,9 @@ renorm_dist_Hellinger_static = dist_Hellinger_static/dist_Hellinger_static.max()
 renorm_dist_ChiSquareAlt_static = dist_ChiSquareAlt_static/dist_ChiSquareAlt_static.max()
 renorm_dist_KLDiv_static = dist_KLDiv_static/dist_KLDiv_static.max()
 
-
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
 plt.plot(X,renorm_dist_Correl, label = "Correlation")
 plt.plot(X,renorm_dist_ChiSquare, label = "ChiSquare")
 plt.plot(X,renorm_dist_Intersection, label = "Intersection")
@@ -159,12 +180,13 @@ plt.plot(X,renorm_dist_Bhattacharyya, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv, label = "KLDiv")
-for idx in cutGroundTruth:
-    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
 
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
 plt.plot(X,renorm_dist_Correl_static, label = "Correlation")
 plt.plot(X,renorm_dist_ChiSquare_static, label = "ChiSquare")
 plt.plot(X,renorm_dist_Intersection_static, label = "Intersection")
@@ -172,8 +194,6 @@ plt.plot(X,renorm_dist_Bhattacharyya_static, label = "Bhattacharyya")
 plt.plot(X,renorm_dist_Hellinger_static, label = "Hellinger")
 plt.plot(X,renorm_dist_ChiSquareAlt_static, label = "ChiSquareAlt")
 plt.plot(X,renorm_dist_KLDiv_static, label = "KLDiv")
-for idx in cutGroundTruth:
-    plt.axvline(x=idx, color='k')
 plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
