@@ -9,7 +9,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import time
-import auxFucntion as af
+import auxFunctions as af
 
 filename = 'Extrait1-Cosmos_Laundromat1(340p).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
