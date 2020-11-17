@@ -22,7 +22,7 @@ cutGroundTruth = af.getCutGroundTruth(filename)
 
 nVal = 256
 nbImages = 3168
-nbFrames = 50
+nbFrames = 50 #Nombre d'images sur lesquelles sera calcule la transition : une moyenne sur nbFrame/2 avavnt et apres
 seuil=0.65
 
 histUV = np.zeros((nVal, nVal))
@@ -45,7 +45,6 @@ X = np.arange(nbImages)
 ret, frame = cap.read()
 
 index = 0
-ret = True
 while(ret):
 
     #Transformation de l'image pour la lire en Yuv.
@@ -54,8 +53,7 @@ while(ret):
     #cv2.imshow('Images', frame)
 
     #Calcul de l'histogramme de l'image Yuv
-    histUV = cv2.calcHist([frame_Yuv], [1, 2], None, [
-                          256, 256], [0, 256, 0, 256])
+    histUV = cv2.calcHist([frame_Yuv], [1, 2], None, [256, 256], [0, 256, 0, 256])
 
     #Sauvegarde de l'histogramme pour pouvoir faire la moyenne glissante
     buffHist[index % nbFrames] = histUV
