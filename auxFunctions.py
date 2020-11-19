@@ -50,7 +50,7 @@ def getNbFrame (videoFilename,default):
     if videoFilename == 'Rotation_OY(Pan).m4v':
         nbFrame = 145
         return nbFrame
-    if videoFilename == 'Rotation_OZ(Pan).m4v':
+    if videoFilename == 'Rotation_OZ(Roll).m4v':
         nbFrame = 111
         return nbFrame
     if videoFilename == 'Travelling_OX.m4v':
