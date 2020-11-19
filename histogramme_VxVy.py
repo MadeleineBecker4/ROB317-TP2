@@ -11,16 +11,29 @@ import matplotlib.pyplot as plt
 import time
 import auxFunctions as af
 
-filename = 'ZOOM_O_TRAVELLING.m4v'
+filename = 'Rotation_OZ(Roll).m4v'
 #filename = 'Rotation_OY(Pan).m4v'
 directory = '../TP2_Videos_Exemples/'
 #directory = './TP2_Videos/'
 imgDir = '../figure/newfig/'
 #imgDir = './Images/'
 # indice de la frame juste apres une coupure
-cutGroundTruth = af.getCutGroundTruth(filename) 
-histSize = 61 # impaire
+cutGroundTruth = af.getCutGroundTruth(filename)
 nbImages = af.getNbFrame(filename,100000) # nombre de frame de la video
+
+histSize = 61 # impaire
+vxMinHist = -20
+vxMaxHist = 20
+vyMinHist = -20
+vyMaxHist = 20
+vxRange = (np.arange(histSize) +1/2) * (vxMaxHist - vxMinHist) / histSize + vxMinHist
+vyRange = (np.arange(histSize) +1/2) * (vyMaxHist - vyMinHist) / histSize + vyMinHist
+vxGrid, vyGrid = np.meshgrid(vxRange, vyRange, indexing = 'ij')
+V_unrolled = np.array([vxGrid.ravel(),vyGrid.ravel()])
+meanVx = np.zeros(nbImages)
+meanVy = np.zeros(nbImages)
+covV = np.zeros((nbImages,2,2))
+
 
 histVxVy = np.zeros((histSize,histSize))
 histShape = np.shape(histVxVy)
@@ -82,7 +95,13 @@ while(ret):
     VyMax[index] = flow[:,:,1].max()
     VyMin[index] = flow[:,:,1].min()
     
-    histVxVy = cv2.calcHist([flow],[0,1], None, [histSize,histSize], [-20,20,-20,20])
+    histVxVy = cv2.calcHist([flow],[0,1], None, [histSize,histSize], [vxMinHist,vxMaxHist,vyMinHist,vyMaxHist])
+    histVx = np.sum(histVxVy, axis = 1)
+    histVy = np.sum(histVxVy, axis = 0)
+    meanVx[index] = sum(vxRange*histVx) /sum(histVx)
+    meanVy[index] = sum(vyRange*histVy) /sum(histVy)
+    unrolled_histVxVy = histVxVy.ravel()
+    covV[index,:,:] = np.cov(V_unrolled, fweights = unrolled_histVxVy)
     
     zoomHistVxVy[0::3, 0::3] = histVxVy
     zoomHistVxVy[0::3, 1::3] = histVxVy
@@ -198,6 +217,32 @@ plt.legend()
 plt.title("All possible distances in compareHist")
 plt.show()
 
+
+valp = np.linalg.eigvalsh(covV)
+
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
+plt.plot(X, meanVx, label = "meanVx")
+plt.plot(X, meanVy, label = "meanVy")
+plt.legend()
+plt.show()
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
+plt.plot(X,covV[:,0,0], label = "covVxVx")
+plt.plot(X,covV[:,0,1], label = "covVxVy")
+plt.plot(X,covV[:,1,0], label = "covVyVx")
+plt.plot(X,covV[:,1,1], label = "covVyVy")
+plt.legend()
+plt.show()
+if cutGroundTruth != None:
+    for idx in cutGroundTruth:
+        plt.axvline(x=idx, color='k')
+plt.plot(X, valp[:,0], 'b')
+plt.plot(X, valp[:,1], 'r')
+plt.title("valeur propre de la covariance de V pour chaque frame")
+plt.show()
 
 
 
