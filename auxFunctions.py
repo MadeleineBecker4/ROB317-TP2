@@ -26,7 +26,7 @@ def getCutGroundTruth (videoFilename):
         return CutGroundTruth
     return None
 
-def getNbFrame (videoFilename,default):
+def getNbFrame (videoFilename):
     '''
     video file name est le nome du fichier de la video
     Parameters
@@ -62,4 +62,4 @@ def getNbFrame (videoFilename,default):
     if videoFilename == 'ZOOM_O_TRAVELLING.m4v':
         nbFrame = 379
         return nbFrame
-    return default
+    return None
