@@ -1,5 +1,5 @@
 # ROB317-TP2
-The TP2 of ROB317 by Iad ABDUL-RAOUF and Madeleine BECKER
+par ABDUL-RAOUF et Madeleine BECKER
 
 
 Les fichiers `Dense-Optical-Flow.py` et `Sparse-Optical-Flow.py` sont les codes fournis dans le TP.
